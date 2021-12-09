@@ -16,13 +16,13 @@ import java.util.Properties;
  * 百度SDK完成人脸识别功能
  */
 public class FaceDetect {
-/*    public static String APP_ID;
+    public static String APP_ID;
     public static String API_KEY;
     public static String SECRET_KEY;
 
-    *//**
+    /**
      * 读取配置文件 初始化参数
-     *//*
+     */
     static {
         Properties properties = new Properties();
         try {
@@ -33,10 +33,8 @@ public class FaceDetect {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }*/
-    public static final String APP_ID = "25283923";
-    public static final String API_KEY = "RWohyC33826G208OPDPQTOCf";
-    public static final String SECRET_KEY = "AbNhbkaa0d2HTm4zyEqIeIw2wMbtnaZd";
+    }
+
     /**
      * 人脸识别功能接口
      *
