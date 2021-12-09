@@ -1,0 +1,31 @@
+
+# 数据库连接池
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://192.168.31.81:3306/mytanhua
+    username: root
+    password: root
+
+# Dubbo
+dubbo:
+  application:
+    name: dubbo-mysql
+    qos-port: 33333
+  scan:
+    basePackages: com.itheima.dubbo.mysql.impl
+  protocol:
+    name: dubbo
+    port: 20880
+  registry:
+    address: zookeeper://192.168.31.81:2181
+
+
+# 配置MP的表名前缀
+mybatis-plus:
+  global-config:
+    db-config:
+      table-prefix: tb_
+      id-type: auto
+server:
+  port: 18082
