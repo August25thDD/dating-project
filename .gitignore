@@ -54,3 +54,4 @@ hs_err_pid*
 .sass-cache/
 *.css.map
 /commons/src/main/resources/aliyun.properties
+/commons/src/main/resources/*.properties

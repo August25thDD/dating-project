@@ -65,4 +65,8 @@ public class ErrorResult {
     public static ErrorResult contentError() {
         return ErrorResult.builder().errCode("300001").errMessage("发布圈子内容不能为空").build();
     }
+
+    public static ErrorResult photoDetectFaceError() {
+        return ErrorResult.builder().errCode("100009").errMessage("图片格式不对").build();
+    }
 }
