@@ -39,11 +39,20 @@ public class Constants {
     //圈子互动KEY
     public static final String MOVEMENTS_INTERACT_KEY = "MOVEMENTS_INTERACT_";
 
-    //动态点赞用户HashKey
-    public static final String MOVEMENT_LIKE_HASHKEY = "MOVEMENT_LIKE_";
+    //动态点赞数 HashKey
+    public static final String MOVEMENT_LIKE_HASHKEY = "MOVEMENT_LIKE";
 
-    //动态喜欢用户HashKey
-    public static final String MOVEMENT_LOVE_HASHKEY = "MOVEMENT_LOVE_";
+    //动态喜欢数 HashKey
+    public static final String MOVEMENT_LOVE_HASHKEY = "MOVEMENT_LOVE";
+
+    //动态评论数 HashKey
+    public static final String MOVEMENT_COMMENT_HASHKEY = "MOVEMENT_COMMENT_HASHKEY";
+
+    //用户是否点赞 HashKey
+    public static final String MOVEMENT_ISLIKE_HASHKEY = "MOVEMENT_ISLIKE_HASHKEY_";
+
+    //用户是否喜欢 HashKey
+    public static final String MOVEMENT_ISLOVE_HASHKEY = "MOVEMENT_ISLOVE_HASHKEY_";
 
     //视频点赞用户HashKey
     public static final String VIDEO_LIKE_HASHKEY = "VIDEO_LIKE";

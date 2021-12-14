@@ -1,9 +1,10 @@
 package com.yang.appserver.controller;
 
 import com.yang.appserver.config.MyCache;
+import com.yang.appserver.service.CommentsService;
 import com.yang.appserver.service.PublishService;
-import com.yang.commons.pojo.Publish;
 import com.yang.commons.vo.PageResult;
+import com.yang.commons.vo.QuanZiVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,9 @@ public class PublishController {
 
     @Autowired
     private PublishService publishService;
+
+    @Autowired
+    private CommentsService commentsService;
 
     /**
      * 发布动态
@@ -62,6 +66,47 @@ public class PublishController {
     @GetMapping("visitors")
     public ResponseEntity visitors() {
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("{id}/like")
+    public Long likeComment(@PathVariable("id") String publishId) {
+        //返回最新点赞数
+        Long likeCount = commentsService.likeComment(publishId);
+        return likeCount;
+
+    }
+
+    @GetMapping("{id}/dislike")
+    public Long unLikeComment(@PathVariable("id") String publishId) {
+        //返回最新点赞数
+        Long disLikeCount = commentsService.disLikeComment(publishId);
+        return disLikeCount;
+    }
+
+    @GetMapping("{id}/love")
+    public Long loveComment(@PathVariable("id") String publishId) {
+        //返回最新喜欢数
+
+        Long loveCount = commentsService.loveComment(publishId);
+        return loveCount;
+    }
+
+    @GetMapping("{id}/unlove")
+    public Long unLoveComment(@PathVariable("id") String publishId) {
+        Long disLoveCount = commentsService.unloveComment(publishId);
+        return disLoveCount;
+    }
+
+    /**
+     * 查询单条动态信息
+     *
+     * @param publishId
+     * @return
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<QuanZiVo> queryById(@PathVariable("id") String publishId) {
+        QuanZiVo movements = publishService.queryById(publishId);
+        return ResponseEntity.ok(movements);
     }
 
 }

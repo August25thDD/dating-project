@@ -46,4 +46,11 @@ public interface PublishApi {
      */
     List<Publish> randomMovements(Integer pagesize);
 
+    /**
+     * 根据id查询动态
+     *
+     * @param id 动态id
+     * @return
+     */
+    Publish queryPublishById(String id);
 }

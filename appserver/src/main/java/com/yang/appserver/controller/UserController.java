@@ -46,7 +46,7 @@ public class UserController {
      * @param params
      * @return
      */
-    @PostMapping("verificationCode")
+    @PostMapping("loginVerification")
     @NoAuthorization
     public ResponseEntity userloginVerification(@RequestBody Map<String,String> params) {
 

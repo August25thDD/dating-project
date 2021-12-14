@@ -2,7 +2,9 @@ package com.yang.appserver.service;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.google.common.collect.Lists;
@@ -16,6 +18,7 @@ import com.yang.commons.utils.RelativeDateFormat;
 import com.yang.commons.utils.UploadPicUtil;
 import com.yang.commons.vo.PageResult;
 import com.yang.commons.vo.QuanZiVo;
+import com.yang.dubbo.interfaces.CommentApi;
 import com.yang.dubbo.interfaces.PublishApi;
 import com.yang.dubbo.interfaces.UserInfoApi;
 import org.bson.types.ObjectId;
@@ -54,6 +57,9 @@ public class PublishService {
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
+    @Reference
+    private CommentApi commentApi;
+
     /**
      * 发布朋友圈
      *
@@ -69,8 +75,8 @@ public class PublishService {
                                 String latitude,
                                 String longitude,
                                 MultipartFile[] multipartFiles) throws IOException {
-        // 处理文本
-        //        判断文字是否为空
+        //      处理文本
+        //      判断文字是否为空
         if (StrUtil.isEmpty(textContent)) {
             throw new MyException(ErrorResult.contentError());
         }
@@ -188,7 +194,7 @@ public class PublishService {
         // 从上面的结果集中提取发布人的id
         List<Long> userIds = CollUtil.getFieldValues(publishes, "userId", Long.class);
         // 根据上面的这个用户id集合去查询他们的详细信息
-        Map<Long, UserInfo> userInfoMap = userInfoApi.findUserInfoListByUserIds(new UserInfo(), userIds);
+        Map<Long, UserInfo> userInfoMap = userInfoApi.findUserInfoListByUserIds(userIds);
         // 拼凑VO对象
         List<QuanZiVo> quanZiVoList = publishVODataFormart(publishes, userInfoMap);
 
@@ -227,16 +233,89 @@ public class PublishService {
 
             // 评论相关
             // 先给一些默认值 等到 后台讲完评论
-            quanZiVo.setLikeCount(0);
-            quanZiVo.setCommentCount(0);
-            quanZiVo.setLoveCount(0);
-            quanZiVo.setHasLiked(0);
-            quanZiVo.setHasLoved(0);
+            Long likeCount = Convert.toLong(redisTemplate.opsForHash()
+                    .get(Constants.MOVEMENTS_INTERACT_KEY + publish.getId()
+                    , Constants.MOVEMENT_LIKE_HASHKEY));
+//           说明这个圈子没有人点赞或者是有人点赞但是redis中没有值
+            if (ObjectUtil.isNull(likeCount)) {
+//                从MongoDB中进行查询
+                 likeCount = commentApi.queryLikeCount(publish.getId());
+                 redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY+publish.getId(),
+                         Constants.MOVEMENT_LIKE_HASHKEY,likeCount.toString());
+            }
+            quanZiVo.setLikeCount(Convert.toInt(likeCount));
+
+            // 评论数
+            Long commentCount = Convert.toLong(redisTemplate.opsForHash()
+                    .get(Constants.MOVEMENTS_INTERACT_KEY + publish.getId(), Constants.MOVEMENT_COMMENT_HASHKEY));
+            if (ObjectUtil.isNull(commentCount)) {
+                // 从MongoDB中进行查询
+                commentCount = commentApi.queryCommentCount(publish.getId());
+                // 把查询到数据给保存到Redis中
+                redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + publish.getId()
+                        ,Constants.MOVEMENT_COMMENT_HASHKEY, commentCount.toString());
+            }
+            quanZiVo.setCommentCount(Convert.toInt(commentCount));
+
+            // 喜欢数
+            Long loveCount = Convert.toLong(redisTemplate.opsForHash()
+                    .get(Constants.MOVEMENTS_INTERACT_KEY + publish.getId(), Constants.MOVEMENT_LOVE_HASHKEY));
+            if (ObjectUtil.isNull(loveCount)) {
+                // 从MongoDB中进行查询
+                loveCount = commentApi.queryLoveCount(publish.getId());
+                // 把查询到数据给保存到Redis中
+                redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + publish.getId()
+                        ,Constants.MOVEMENT_LOVE_HASHKEY, loveCount.toString());
+            }
+            quanZiVo.setLoveCount(Convert.toInt(loveCount));
+
+
+            // 是否点赞
+            Boolean isLike = redisTemplate.opsForHash().hasKey(Constants.MOVEMENTS_INTERACT_KEY
+                    , Constants.MOVEMENT_ISLIKE_HASHKEY + UserThreadLocal.getUserId());
+            if (!isLike) {
+                // 从MongoDB中进行查询
+                isLike = commentApi.queryUserIsLike(UserThreadLocal.getUserId(), publish.getId());
+                if (isLike) {
+                    // 把查询到数据给保存到Redis中
+                    redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + publish.getId()
+                            , Constants.MOVEMENT_ISLIKE_HASHKEY + UserThreadLocal.getUserId(), "1");
+                }
+            }
+            quanZiVo.setHasLiked(isLike ? 1 : 0);
+
+            // 是否喜欢
+            Boolean isLove = redisTemplate.opsForHash().hasKey(Constants.MOVEMENTS_INTERACT_KEY
+                    , Constants.MOVEMENT_ISLOVE_HASHKEY + UserThreadLocal.getUserId());
+            if (!isLove) {
+                // 从MongoDB中进行查询
+                isLove = commentApi.queryUserIsLove(UserThreadLocal.getUserId(), publish.getId());
+                if (isLove) {
+                    // 把查询到数据给保存到Redis中
+                    redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + publish.getId()
+                            , Constants.MOVEMENT_ISLOVE_HASHKEY + UserThreadLocal.getUserId(), "1");
+                }
+            }
+            quanZiVo.setHasLoved(isLove ? 1 : 0);
+
             // 写死距离
             quanZiVo.setDistance("1.2公里");
 
             quanZiVoList.add(quanZiVo);
         }
         return quanZiVoList;
+    }
+
+    /**
+     * 查询单条动态信息
+     * @param publishId
+     * @return
+     */
+    public QuanZiVo queryById(String publishId) {
+        Publish publish = publishApi.queryPublishById(publishId);
+        UserInfo userInfo = userInfoApi.findUserInfoByUserId(publish.getUserId());
+        List<QuanZiVo> quanZiVoList = publishVODataFormart(CollUtil.toList(publish),
+                MapUtil.builder(userInfo.getUserId(), userInfo).build());
+        return quanZiVoList.get(0);
     }
 }

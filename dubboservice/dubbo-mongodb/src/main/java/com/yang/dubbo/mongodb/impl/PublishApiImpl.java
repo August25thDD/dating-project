@@ -56,7 +56,16 @@ public class PublishApiImpl implements PublishApi {
         // 从MongoDB中随机抽样数据
         AggregationResults<Publish> aggregationResults = mongoTemplate.aggregate(Aggregation.newAggregation(Publish.class, Aggregation.sample(Convert.toLong(pagesize))),
                 Publish.class);
-        List<Publish> mappedResults = aggregationResults.getMappedResults();
-        return mappedResults;
+        return aggregationResults.getMappedResults();
+    }
+
+    /**
+     *
+     * @param id 动态id
+     * @return
+     */
+    @Override
+    public Publish queryPublishById(String id) {
+        return mongoTemplate.findOne(Query.query(Criteria.where("id").is(id)), Publish.class);
     }
 }
