@@ -5,12 +5,14 @@ import com.yang.appserver.service.CommentsService;
 import com.yang.appserver.service.PublishService;
 import com.yang.commons.vo.PageResult;
 import com.yang.commons.vo.QuanZiVo;
+import com.yang.commons.vo.VisitorsVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @program: my-tanhua
@@ -63,11 +65,6 @@ public class PublishController {
         return ResponseEntity.ok(pr);
     }
 
-    @GetMapping("visitors")
-    public ResponseEntity visitors() {
-        return ResponseEntity.ok(null);
-    }
-
     @GetMapping("{id}/like")
     public Long likeComment(@PathVariable("id") String publishId) {
         //返回最新点赞数
@@ -86,9 +83,9 @@ public class PublishController {
     @GetMapping("{id}/love")
     public Long loveComment(@PathVariable("id") String publishId) {
         //返回最新喜欢数
-
         Long loveCount = commentsService.loveComment(publishId);
         return loveCount;
+
     }
 
     @GetMapping("{id}/unlove")
@@ -109,4 +106,24 @@ public class PublishController {
         return ResponseEntity.ok(movements);
     }
 
+    @GetMapping("visitors")
+    public ResponseEntity visitors() {
+        List<VisitorsVo> visitorsVos =  publishService.visitorsTop();
+        return ResponseEntity.ok(visitorsVos);
+    }
+
+    /**
+     * 自己的所有动态
+     * @param page
+     * @param pageSize
+     * @param userId   要查询的那个人的ID  不是登录人的ID
+     * @return
+     */
+    @GetMapping("all")
+    public ResponseEntity queryAlbumList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                         @RequestParam(value = "pagesize", defaultValue = "10") Integer pageSize,
+                                         @RequestParam(value = "userId") Long userId) {
+        PageResult pageResult = publishService.queryAlbumList(userId, page, pageSize);
+        return ResponseEntity.ok(pageResult);
+    }
 }

@@ -1,5 +1,6 @@
 package com.yang.commons.vo;
 
+
 import cn.hutool.core.util.ObjectUtil;
 import com.yang.commons.pojo.RecommendUser;
 import com.yang.commons.pojo.UserInfo;
@@ -7,27 +8,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 今日佳人
- */
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TodayBest {
 
-    private Long id; //用户id
+    //用户id
+    private Long id;
     private String avatar;
     private String nickname;
-    private String gender; //性别 man woman
+    //性别 man woman
+    private String gender;
     private Integer age;
     private String[] tags;
-    private Long fateValue; //缘分值
+    //缘分值
+    private Long fateValue;
 
     /**
      * 在vo对象中，补充一个工具方法，封装转化过程
      */
     public static TodayBest init(UserInfo userInfo, RecommendUser recommendUser) {
-        if (ObjectUtil.isNull(userInfo)){
+        if (ObjectUtil.isNull(userInfo)) {
             return null;
         }
         TodayBest vo = new TodayBest();

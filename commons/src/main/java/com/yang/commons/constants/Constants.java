@@ -34,7 +34,7 @@ public class Constants {
     public static final String QUANZI_PUBLISH_RECOMMEND = "QUANZI_PUBLISH_RECOMMEND_";
 
     //推荐视频
-    public static final String VIDEOS_RECOMMEND = "VIDEOS_RECOMMEND_";
+    public static final String VIDEOS_RECOMMEND = "QUANZI_VIDEO_RECOMMEND_";
 
     //圈子互动KEY
     public static final String MOVEMENTS_INTERACT_KEY = "MOVEMENTS_INTERACT_";
@@ -54,10 +54,22 @@ public class Constants {
     //用户是否喜欢 HashKey
     public static final String MOVEMENT_ISLOVE_HASHKEY = "MOVEMENT_ISLOVE_HASHKEY_";
 
-    //视频点赞用户HashKey
+    //小视频互动KEY
+    public static final String VIDEOS_INTERACT_KEY = "VIDEOS_INTERACT_";
+
+    // 视频点赞用户HashKey
     public static final String VIDEO_LIKE_HASHKEY = "VIDEO_LIKE";
 
-    //访问用户
+    // 视频评论 HashKey
+    public static final String VIDEO_COMMENT_HASHKEY = "VIDEO_COMMENT";
+
+    // 视频是否点赞HashKey
+    public static final String VIDEO_ISLIKE_HASHKEY = "VIDEO_ISLIKE_";
+
+    // 视频关注主播HashKey
+    public static final String VIDEO_FOLLOW_HASHKEY = "VIDEO_FOLLOW_";
+
+    // 访问用户
     public static final String VISITORS_USER = "VISITOR_USER";
 
     //初始化密码
@@ -74,6 +86,9 @@ public class Constants {
 
     //关注用户的key
     public static final String FOCUS_USER_KEY = "FOCUS_USER_KEY_";
+
+    //记录首页来访者查询时间
+    public static final String VISITORS_USER_KEY = "VISITORS_USER_KEY_";
 
     // PID/VID在Redis中的Key
     public static final String TANHUA_UNIT_ID = "TANHUA_UNIT_ID";

@@ -22,7 +22,7 @@ public interface CommentApi {
      * @param publishId
      * @return
      */
-    Long unLikeComment(Long userId, ObjectId publishId);
+    Long disLikeComment(Long userId, ObjectId publishId);
 
 
     /**

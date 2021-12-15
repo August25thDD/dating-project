@@ -3,6 +3,7 @@ package com.yang.dubbo.mongodb.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import com.alibaba.dubbo.config.annotation.Service;
+import com.yang.commons.pojo.Album;
 import com.yang.commons.pojo.Publish;
 import com.yang.commons.pojo.TimeLine;
 import com.yang.dubbo.interfaces.PublishApi;
@@ -36,8 +37,7 @@ public class PublishApiImpl implements PublishApi {
         // 查询自己的时间线表
         List<TimeLine> timeLines = mongoTemplate.find(new Query()
                         .with(Sort.by(Sort.Order.desc("date")))
-                        .with(PageRequest.of(page - 1, pagesize))
-                , TimeLine.class, "quanzi_time_line_" + userId);
+                        .with(PageRequest.of(page - 1, pagesize)), TimeLine.class, "quanzi_time_line_" + userId);
 //        获取圈子id的集合
         List<ObjectId> publishIds = CollUtil.getFieldValues(timeLines, "publishId", ObjectId.class);
         // 根据上面的圈子id去查询发布表
@@ -67,5 +67,18 @@ public class PublishApiImpl implements PublishApi {
     @Override
     public Publish queryPublishById(String id) {
         return mongoTemplate.findOne(Query.query(Criteria.where("id").is(id)), Publish.class);
+    }
+
+    @Override
+    public List<Publish> findMovementsByUserId(Integer page, Integer pagesize, Long userId) {
+        // 先查询这个人的相册表
+        List<Album> albumList = mongoTemplate.find(new Query()
+                        .with(Sort.by(Sort.Order.desc("created")))
+                        .with(PageRequest.of(page - 1, pagesize))
+                , Album.class, "quanzi_album_" + userId);
+        // 提取圈子的ID
+        List<Object> publishIds = CollUtil.getFieldValues(albumList, "publishId");
+        // 再根据圈子的id查询圈子的发布表
+        return mongoTemplate.find(Query.query(Criteria.where("id").in(publishIds)), Publish.class);
     }
 }

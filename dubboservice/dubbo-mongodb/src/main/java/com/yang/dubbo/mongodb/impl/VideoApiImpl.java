@@ -2,12 +2,15 @@ package com.yang.dubbo.mongodb.impl;
 
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.ObjectUtil;
 import com.alibaba.dubbo.config.annotation.Service;
 import com.yang.commons.pojo.FollowUser;
 import com.yang.commons.pojo.Video;
 import com.yang.commons.vo.PageResult;
 import com.yang.dubbo.interfaces.VideoApi;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -33,12 +36,14 @@ public class VideoApiImpl implements VideoApi {
     @Override
     public PageResult queryVideoList(Long userId, Integer page, Integer pageSize) {
 
+
         return null;
     }
 
     @Override
     public Video queryVideoById(String videoId) {
-        return mongoTemplate.findOne(Query.query(Criteria.where("id").is(videoId)), Video.class);
+        return mongoTemplate.findOne(Query.query(Criteria.where("id").is(videoId))
+                , Video.class);
     }
 
     // 关注主播
@@ -55,7 +60,9 @@ public class VideoApiImpl implements VideoApi {
 
     @Override
     public Boolean isFollowUser(Long userId, Long followUserId) {
-        return null;
+        FollowUser followUser = mongoTemplate.findOne(Query.query(Criteria.where("userId").is(userId)
+                .and("followUserId").is(followUserId)), FollowUser.class);
+        return ObjectUtil.isNotNull(followUser);
     }
 
     // 随机从video表中抽取指定条数的小视频数据

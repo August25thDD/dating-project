@@ -5,10 +5,7 @@ import com.yang.commons.vo.PageResult;
 import com.yang.commons.vo.TodayBest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -47,5 +44,17 @@ public class TanhuaController {
     public ResponseEntity recommendation(@RequestParam Map<String, Object> params) {
         PageResult pageResult = tanhuaService.recommendationList(params);
         return ResponseEntity.ok(pageResult);
+    }
+
+    /**
+     * 查询个人主页的个人信息
+     *
+     * @param userId
+     * @return
+     */
+    @GetMapping("{id}/personalInfo")
+    public ResponseEntity<TodayBest> queryUserInfo(@PathVariable("id") Long userId) {
+        TodayBest todayBest = tanhuaService.queryUserInfo(userId);
+        return ResponseEntity.ok(todayBest);
     }
 }

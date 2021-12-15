@@ -19,7 +19,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Builder
 public class User implements Serializable {
-
     private Long id;
     private String mobile;
     private String password;

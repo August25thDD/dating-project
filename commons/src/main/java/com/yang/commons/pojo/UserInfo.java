@@ -7,6 +7,14 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * @项目名称: tanhua-53
+ * @包名: com.itheima.dubbo.domian
+ * @作者: 李云飞
+ * @日期: 2021-12-03
+ */
 
 @Data
 @NoArgsConstructor
@@ -28,13 +36,14 @@ public class UserInfo implements Serializable {
     private String industry; //行业
     private String income; //收入
     private String marriage; //婚姻状态
+    private Date created; // 创建时间
+    private Date updated; // 修改时间
 
     public void setSex(String sex) {
         if (StrUtil.isNotBlank(sex)) {
             this.sex = "man".equals(sex) ? 1 : 2;
-        }else {
+        } else {
             this.sex = null;
         }
     }
-
 }

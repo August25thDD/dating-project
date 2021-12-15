@@ -11,4 +11,7 @@ public interface RecommendUserApi {
     // 分页查询
     PageResult queryRecommendUserList(Integer page, Integer pagesize, Long toUserId);
 
+
+    RecommendUser queryScoreByUserId(Long userId, Long userId1);
+
 }

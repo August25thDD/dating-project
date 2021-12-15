@@ -38,6 +38,14 @@ public class RecommendUserApiImpl implements RecommendUserApi {
         return recommendUser;
     }
 
+    /**
+     * 首页推荐列表
+     *
+     * @param page
+     * @param pagesize
+     * @param toUserId
+     * @return
+     */
     @Override
     public PageResult queryRecommendUserList(Integer page, Integer pagesize, Long toUserId) {
         // 在实际开发中如果有些需求 是模棱两可的  怎么做都行
@@ -45,13 +53,26 @@ public class RecommendUserApiImpl implements RecommendUserApi {
         List<RecommendUser> recommendUsers = mongoTemplate.find(Query.query(Criteria.where("toUserId").is(toUserId))
                         .with(Sort.by(Sort.Order.desc("score")))
                         .with(PageRequest.of(page - 1, pagesize))
-                , RecommendUser.class
-        );
+                , RecommendUser.class);
         // 凡是涉及到分页的查询
         // 我们一般都要把分页相关参数都返回
         // 当前页码  每页显示的条数 每页的数据 总的页码 总的条数
-
-        long counts = mongoTemplate.count(new Query(), RecommendUser.class);
+        Long counts = mongoTemplate.count(new Query(), RecommendUser.class);
         return new PageResult(page, pagesize, counts, recommendUsers);
     }
+
+    /**
+     * 查询佳人
+     * @param toUserId
+     * @param userId
+     * @return
+     */
+    @Override
+    public RecommendUser queryScoreByUserId(Long toUserId, Long userId) {
+        return mongoTemplate.findOne(Query.query(
+                Criteria.where("toUserId").is(toUserId)
+                        .and("userId").is(userId)), RecommendUser.class);
+    }
+
+
 }

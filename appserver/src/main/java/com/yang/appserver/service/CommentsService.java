@@ -72,11 +72,12 @@ public class CommentsService {
 
     /**
      * 取消赞
-     * @param  publishId
+     *
+     * @param publishId
      * @return
      */
     public Long disLikeComment(String publishId) {
-        Long disLikeCount = commentApi.unLikeComment(UserThreadLocal.getUserId(), new ObjectId(publishId));
+        Long disLikeCount = commentApi.disLikeComment(UserThreadLocal.getUserId(), new ObjectId(publishId));
         // 把当前这个圈子的点赞数给保存到redis中
         redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + publishId,
                 Constants.MOVEMENT_LIKE_HASHKEY, disLikeCount.toString());
@@ -87,8 +88,8 @@ public class CommentsService {
     }
 
     /**
-     *
      * 喜欢圈子
+     *
      * @param publishId
      * @return
      */
@@ -105,6 +106,7 @@ public class CommentsService {
 
     /**
      * 取消喜欢
+     *
      * @param publishId
      * @return
      */
@@ -119,6 +121,7 @@ public class CommentsService {
 
     /**
      * 查询评论列表
+     *
      * @param publishId
      * @param page
      * @param pageSize
@@ -133,14 +136,14 @@ public class CommentsService {
         // 从评论列表中提取发布评论人的ID
         List<Long> userIds = CollUtil.getFieldValues(pageResult.getItems(), "userId", Long.class);
         // 根据这个发布人的id集合去查询tb_user_info
-        Map<Long, UserInfo> userInfoList = userInfoApi.findUserInfoListByUserIds(userIds);
+        Map<Long, UserInfo> userInfoList = userInfoApi.findUserInfoListByUserIds(null, userIds);
 
         List<CommentVo> voList = new ArrayList<>();
         for (Object item : pageResult.getItems()) {
             Comment comment = (Comment) item;
             // 拼凑vo对象
             CommentVo commentVo = new CommentVo();
-            // 评论的ida
+            // 评论的id
             commentVo.setId(comment.getId().toHexString());
             // 评论的内容
             commentVo.setContent(comment.getContent());
@@ -155,28 +158,25 @@ public class CommentsService {
             commentVo.setNickname(userInfo.getNickName());
 
             // 评论的点赞数量
-            Long likeCount = Convert.toLong(redisTemplate.opsForHash().get(Constants.MOVEMENTS_INTERACT_KEY + comment.getId(),
-                    Constants.MOVEMENT_LIKE_HASHKEY));
+            Long likeCount = Convert.toLong(redisTemplate.opsForHash().get(Constants.MOVEMENTS_INTERACT_KEY + comment.getId(), Constants.MOVEMENT_LIKE_HASHKEY));
             // 说明当前这个圈子没有人点赞 或者有人点赞但是Redis中没值
             if (ObjectUtil.isNull(likeCount)) {
                 // 从MongoDB中进行查询
                 likeCount = commentApi.queryLikeCount(comment.getId());
                 // 把查询到数据给保存到Redis中
-                redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + comment.getId(),
-                        Constants.MOVEMENT_LIKE_HASHKEY, likeCount.toString());
+                redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + comment.getId(), Constants.MOVEMENT_LIKE_HASHKEY, likeCount.toString());
             }
             commentVo.setLikeCount(Convert.toInt(likeCount));
 
+
             // 是否点赞
-            Boolean isLike = redisTemplate.opsForHash().hasKey(Constants.MOVEMENTS_INTERACT_KEY,
-                    Constants.MOVEMENT_ISLIKE_HASHKEY + UserThreadLocal.getUserId());
+            Boolean isLike = redisTemplate.opsForHash().hasKey(Constants.MOVEMENTS_INTERACT_KEY, Constants.MOVEMENT_ISLIKE_HASHKEY + UserThreadLocal.getUserId());
             if (!isLike) {
                 // 从MongoDB中进行查询
                 isLike = commentApi.queryUserIsLike(UserThreadLocal.getUserId(), comment.getId());
                 if (isLike) {
                     // 把查询到数据给保存到Redis中
-                    redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + comment.getId(),
-                            Constants.MOVEMENT_ISLIKE_HASHKEY + UserThreadLocal.getUserId(), "1");
+                    redisTemplate.opsForHash().put(Constants.MOVEMENTS_INTERACT_KEY + comment.getId(), Constants.MOVEMENT_ISLIKE_HASHKEY + UserThreadLocal.getUserId(), "1");
                 }
             }
             // 当前登录用户是否对该评论点赞
@@ -185,10 +185,12 @@ public class CommentsService {
         }
         pageResult.setItems(voList);
         return pageResult;
+
     }
 
     /**
      * 发布评论
+     *
      * @param publishId
      * @param content
      */
@@ -221,6 +223,12 @@ public class CommentsService {
 
     }
 
+    /**
+     * 点赞公共方法
+     *
+     * @param publishId
+     * @return
+     */
     public Long publicLikeComment(String publishId) {
         // 调用Dubbo实现一个点赞
         Comment comment = new Comment();
@@ -244,9 +252,9 @@ public class CommentsService {
             // publishId有可能是评论表中的ID 也有可能是 小视频中的ID
             // 根据这个publishId去查询评论表
             Comment commentId = commentApi.queryCommentById(publishId);
-            if (ObjectUtil.isNotNull(commentId)){
+            if (ObjectUtil.isNotNull(commentId)) {
                 comment.setPublishUserId(commentId.getUserId());
-            }else {
+            } else {
                 Video video = videoApi.queryVideoById(publishId);
                 comment.setPublishUserId(video.getUserId());
             }
@@ -261,6 +269,12 @@ public class CommentsService {
         return likeCount;
     }
 
+    /**
+     * 喜欢公共方法
+     *
+     * @param publishId
+     * @return
+     */
     private Long publicLoveComment(String publishId) {
         // 调用Dubbo实现一个喜欢
         Comment comment = new Comment();

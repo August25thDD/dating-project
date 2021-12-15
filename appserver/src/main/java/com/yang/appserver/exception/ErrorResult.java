@@ -66,7 +66,19 @@ public class ErrorResult {
         return ErrorResult.builder().errCode("300001").errMessage("发布圈子内容不能为空").build();
     }
 
-    public static ErrorResult photoDetectFaceError() {
-        return ErrorResult.builder().errCode("100009").errMessage("图片格式不对").build();
+    public static ErrorResult smallVideoUploadError() {
+        return ErrorResult.builder().errCode("400001").errMessage("上传小视频不能为空").build();
+    }
+
+    public static ErrorResult userRegitError() {
+        return ErrorResult.builder().errCode("100009").errMessage("用户注册失败, 请重试").build();
+    }
+
+    public static ErrorResult sendHXMsgError() {
+        return ErrorResult.builder().errCode("500001").errMessage("发送环信消息失败,请稍后重试").build();
+    }
+
+    public static ErrorResult addFriendError() {
+        return ErrorResult.builder().errCode("500002").errMessage("添加好友失败").build();
     }
 }

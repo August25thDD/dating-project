@@ -18,6 +18,7 @@ import com.yang.commons.utils.RelativeDateFormat;
 import com.yang.commons.utils.UploadPicUtil;
 import com.yang.commons.vo.PageResult;
 import com.yang.commons.vo.QuanZiVo;
+import com.yang.commons.vo.VisitorsVo;
 import com.yang.dubbo.interfaces.CommentApi;
 import com.yang.dubbo.interfaces.PublishApi;
 import com.yang.dubbo.interfaces.UserInfoApi;
@@ -317,5 +318,22 @@ public class PublishService {
         List<QuanZiVo> quanZiVoList = publishVODataFormart(CollUtil.toList(publish),
                 MapUtil.builder(userInfo.getUserId(), userInfo).build());
         return quanZiVoList.get(0);
+    }
+
+    // 查询个人的所有圈子详情
+    public PageResult queryAlbumList(Long userId, Integer page, Integer pageSize) {
+        // 这个人发布过的所有圈子 分页 排序
+        List<Publish> movements = publishApi.findMovementsByUserId(page, pageSize, userId);
+
+        // 查询发布人的信息
+        UserInfo userinfo = userInfoApi.findUserInfoByUserId(userId);
+        //  拼凑VO对象
+        List<QuanZiVo> quanZiVos = publishVODataFormart(movements, MapUtil.builder(userId, userinfo).build());
+        return new PageResult(page, pageSize, 0L, quanZiVos);
+    }
+
+    public List<VisitorsVo> visitorsTop() {
+
+        return null;
     }
 }

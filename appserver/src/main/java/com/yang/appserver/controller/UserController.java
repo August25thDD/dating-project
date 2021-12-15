@@ -54,7 +54,6 @@ public class UserController {
         return  ResponseEntity.ok(map);
     }
 
-
     /**
      * 完善个人信息
      * @param token

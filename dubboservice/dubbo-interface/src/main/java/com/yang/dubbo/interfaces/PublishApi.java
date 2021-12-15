@@ -53,4 +53,13 @@ public interface PublishApi {
      * @return
      */
     Publish queryPublishById(String id);
+
+    /**
+     * 根据一个用户id 查询这个用户的所有圈子
+     * @param page
+     * @param pagesize
+     * @param userId   要查询的那个用户的ID
+     * @return
+     */
+    List<Publish> findMovementsByUserId(Integer page, Integer pagesize, Long userId);
 }

@@ -47,7 +47,7 @@ public class CommentApiImpl implements CommentApi {
      * @return
      */
     @Override
-    public Long unLikeComment(Long userId, ObjectId publishId) {
+    public Long disLikeComment(Long userId, ObjectId publishId) {
         mongoTemplate.remove(Query.query(Criteria.where("publishId").is(publishId)
                 .and("userId").is(userId)
                 .and("commentType").is(CommentType.LIKE_TYPE.getType())), Comment.class);
